@@ -141,7 +141,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
         }
 
 
-        private static bool IsDate(string format, TypeScriptDateTimeType type)
+        /// <summary>
+        /// IsDate
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool IsDate(string format, TypeScriptDateTimeType type)
         {
             // TODO: Make this more generic (see TypeScriptTypeResolver.ResolveString)
             if (type == TypeScriptDateTimeType.Date)

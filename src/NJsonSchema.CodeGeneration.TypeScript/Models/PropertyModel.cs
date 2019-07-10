@@ -97,6 +97,52 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
         /// <summary>Gets the type of the dictionary item.</summary>
         public string DictionaryItemType => _resolver.TryResolve(_property.ActualTypeSchema?.AdditionalPropertiesSchema, PropertyName) ?? "any";
 
+        /// <summary>
+        /// Gets a value indicating whether the property type is newable
+        /// </summary>
+        public bool IsNewableObject
+        {
+            get
+            {
+                var schema = _resolver.GetResolvableSchema(_property);
+                return IsNewable(schema);
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the array property type is newable
+        /// </summary>
+        public bool IsArrayItemNewableObject
+        {
+            get
+            {
+                var schema = _resolver.GetResolvableSchema(_property);
+                return IsNewable(schema.Item);
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the dictionary property type is newable
+        /// </summary>
+        public bool IsDictionaryValueNewableObject
+        {
+            get
+            {
+                var schema = _resolver.GetResolvableSchema(_property);
+                return IsNewable(schema.AdditionalPropertiesSchema);
+            }
+        }
+
+        /// <summary>
+        /// Is Date
+        /// </summary>
+        public bool IsDate => DataConversionGenerator.IsDate(_resolver.GetResolvableSchema(_property).Format,  _settings.DateTimeType);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsArrayItemDate => DataConversionGenerator.IsDate(_resolver.GetResolvableSchema(_property).Item?.Format, _settings.DateTimeType);
+
         /// <summary>Gets the type postfix (e.g. ' | null | undefined')</summary>
         public string TypePostfix
         {
@@ -171,6 +217,17 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
                 return string.Empty;
             }
+        }
+
+        private bool IsNewable(JsonSchema schema)
+        {
+            if (schema == null)
+                return false;
+
+            if (schema.ActualTypeSchema.IsEnumeration)
+                return false;
+
+            return _resolver.GeneratesType(schema);
         }
     }
 }
